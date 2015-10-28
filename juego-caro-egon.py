@@ -3,38 +3,44 @@ import pilasengine
 
 pilas = pilasengine.iniciar()
 
-pilas.fondos.Tarde()
+
 
 def iniciar_juego():
-    juego=Juego()
-    juego.iniciar()
+    pilas.escenas.PantallaJuego()
 def salir_del_juego():
     pilas.terminar()
     
-menu=pilas.actores.Menu(
-        [
-            ('iniciar juego', iniciar_juego),
-            ('salir', salir_del_juego),
-        ])
 
-
-
-
-    
-   
 class Rzck(pilasengine.actores.Actor):
     def iniciar(self):
      
         self.imagen= self.pilas.imagenes.cargar_grilla("pingu.png",10)
         self.x= 0
         self.y= -150
+class PantallaBienvenida(pilasengine.escenas.Escena):
+
+    def iniciar(self):
+        pilas.fondos.Pasto()
         
+        pilas.actores.Menu(
+        [
+            ('iniciar juego', iniciar_juego),
+            ('salir', salir_del_juego),
+        ])
+
+
+class PantallaJuego(pilasengine.escenas.Escena):
+    def iniciar(self):
+         juego=Juego()
+         juego.iniciar()
+                  
 class Juego():
     puntaje = pilas.actores.Puntaje(-280, 200, color=pilas.colores.violeta)    
 
     def iniciar(self):
-        menu.eliminar()
+        
         pilas.fondos.Volley()
+        self.puntaje = pilas.actores.Puntaje(-280, 200, color=pilas.colores.violeta)
         rzck = Rzck(pilas)
         rzck.aprender("arrastrable")
         bomba= pilas.actores.Bomba() *10
@@ -54,8 +60,15 @@ class Juego():
     def cuando_colisiona1(self, rzck, banana):
         banana.eliminar()
         self.puntaje.reducir(10)
-        if (self.puntaje.texto=="0"):
-            rzck.eliminar()
-            texto = pilas.actores.Texto ("juego terminado")
-            pilas.fondos.Noche()                                                                                  
+        if (self.puntaje.texto=="-10"):
+            pilas.escenas.PantallaBienvenida()
+            #rzck.eliminar()
+            #texto = pilas.actores.Texto ("juego terminado")
+            #pilas.fondos.Noche()                                                                                  
+
+
+
+pilas.escenas.vincular(PantallaBienvenida)
+pilas.escenas.PantallaBienvenida()
+pilas.escenas.vincular(PantallaJuego)
 pilas.ejecutar()
