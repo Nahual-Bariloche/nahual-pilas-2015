@@ -39,11 +39,12 @@ class Juego():
     def explotar_bomba(self,pepa,bomba):
         bomba.explotar()
         self.puntaje.reducir(20)
-        if (self.puntaje.texto == "-20"):
-            texto=pilas.actores.Texto("No Importa")
+        if (int(self.puntaje.texto)<0):
+            texto=pilas.actores.Texto("Try Again")
+            texto.color = pilas.colores.Color(0, 0, 0)
             pilas.fondos.Blanco()
             pepa.eliminar()
-            pilas.escenas.PantallaBienvenida()
+            pilas.tareas.agregar(5,pilas.escenas.PantallaBienvenida)
 
     def iniciar(self):
         pilas.fondos.Tarde()
@@ -59,8 +60,8 @@ class Juego():
     def agregar_bombas(self):
         
         nueva_bomba=pilas.actores.Bomba() 
-        nueva_bomba.x =  pilas.azar(-200, 200) 
-        nueva_bomba.y =  pilas.azar(-200, 200)           
+        nueva_bomba.x =  [-200,pilas.azar(-300,280)]
+        nueva_bomba.y =[-150,pilas.azar(-240,220)]           
         self.bomba.agregar(nueva_bomba)
 
     def agrega(self):
