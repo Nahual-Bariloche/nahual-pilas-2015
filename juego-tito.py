@@ -3,6 +3,8 @@ import pilasengine
 
 pilas = pilasengine.iniciar()
 
+pilas.definir_pantalla_completa(True)
+
 pilas.fondos.Selva()
 
 def iniciar_juego():
@@ -34,11 +36,18 @@ class Juego():
     
     def comer_banana(self,pepa,banana):
         banana.eliminar()
-        self.puntaje.aumentar(10)
+        self.puntaje.aumentar(20)
+        if (int(self.puntaje.texto)>500):
+            texto=pilas.actores.Texto("Lalalalala")
+            texto.color = pilas.colores.Color(250, 250, 250)
+            pilas.fondos.Espacio()
+            pepa.eliminar()
+            pilas.tareas.agregar(5,pilas.escenas.PantallaBienvenida)
+            
     
     def explotar_bomba(self,pepa,bomba):
         bomba.explotar()
-        self.puntaje.reducir(20)
+        self.puntaje.reducir(10)
         if (int(self.puntaje.texto)<0):
             texto=pilas.actores.Texto("Try Again")
             texto.color = pilas.colores.Color(0, 0, 0)
