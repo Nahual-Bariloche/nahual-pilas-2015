@@ -33,10 +33,11 @@ class PantallaJuego(pilasengine.escenas.Escena):
     def iniciar(self):
          juego=Juego()
          juego.iniciar()
-                  
+         
+                                                                                                                                                                                  
 class Juego():
     puntaje = pilas.actores.Puntaje(-280, 200, color=pilas.colores.violeta)    
-
+    pausado=False
     def iniciar(self):
         
         pilas.fondos.Volley()
@@ -49,7 +50,31 @@ class Juego():
         pilas.colisiones.agregar(rzck, aceitunas,self.cuando_colisiona1)
         pilas.tareas.siempre(5, self.agregar_aceituna,aceitunas)
         pilas.tareas.siempre(10,self.agregar_aceituna_orbitales,aceitunas)
+        self.boton_pausa=pilas.actores.Boton(230,215)
         
+        self.boton_pausa.conectar_presionado(self.pausar)
+       
+        
+        
+    def pausar(self):
+        if(self.pausado==True):
+            self.pausado=False
+            self.boton_pausa.pintar_normal()
+            self.texto.eliminar()
+            rzkc.buscar_habilidad_por_nombe("arrastrable").eliminar()
+            
+        else:
+            self.texto=pilas.actores.Texto ("Exit")
+            self.texto.x=230
+            self.texto.y=215
+        
+            self.boton_pausa.pintar_presionado()
+            self.pausado=True
+      
+            
+        
+        
+           
     def agregar_aceituna(self, aceitunas):
         aceituna=pilas.actores.Aceituna()
         aceituna.x=[-200,pilas.azar(0,200)]

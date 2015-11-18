@@ -3,8 +3,6 @@ import pilasengine
 
 pilas = pilasengine.iniciar()
 
-pilas.definir_pantalla_completa(True)
-
 pilas.fondos.Selva()
 
 def iniciar_juego():
@@ -33,17 +31,18 @@ class Pepa (pilasengine.actores.Actor):
 class Juego():
     
     puntaje=pilas.actores.Puntaje(-250,220,color=pilas.colores.blanco)
+    pausado=False
+    
     
     def comer_banana(self,pepa,banana):
         banana.eliminar()
         self.puntaje.aumentar(20)
-        if (int(self.puntaje.texto)>500):
-            texto=pilas.actores.Texto("Lalalalala")
+        if (int(self.puntaje.texto)>450):
+            texto=pilas.actores.Texto("You Win")
             texto.color = pilas.colores.Color(250, 250, 250)
             pilas.fondos.Espacio()
             pepa.eliminar()
             pilas.tareas.agregar(5,pilas.escenas.PantallaBienvenida)
-            
     
     def explotar_bomba(self,pepa,bomba):
         bomba.explotar()
@@ -58,25 +57,46 @@ class Juego():
     def iniciar(self):
         pilas.fondos.Tarde()
         self.puntaje=pilas.actores.Puntaje(-250,220,color=pilas.colores.blanco)  
-        pepa=Pepa(pilas)
-        pilas.eventos.mueve_mouse.conectar(pepa.mover_a_la_posicion_del_mouse)
+        self.pepa=Pepa(pilas)
+        pilas.eventos.mueve_mouse.conectar(self.pepa.mover_a_la_posicion_del_mouse,id="mover")
         banana=pilas.actores.Banana()*30
-        self.bomba=pilas.actores.Bomba()*5
-        pilas.colisiones.agregar(pepa,banana,self.comer_banana)
-        pilas.colisiones.agregar(pepa,self.bomba,self.explotar_bomba)
+        self.bomba=pilas.actores.Bomba()*3
+        pilas.colisiones.agregar(self.pepa,banana,self.comer_banana)
+        pilas.colisiones.agregar(self.pepa,self.bomba,self.explotar_bomba)
+        self.boton=pilas.actores.Boton(245,215)
+        self.boton.conectar_presionado(self.boton_pausa)
 
-
+    def boton_pausa(self):
+        if(self.pausado):
+            self.pausado=False
+            self.boton.pintar_normal()
+            self.texto.eliminar()
+            pilas.eventos.mueve_mouse.conectar(self.pepa.mover_a_la_posicion_del_mouse,id="mover")
+            
+        else:
+            self.boton.pintar_presionado()
+            self.texto=pilas.actores.Texto("Pausado")
+            self.texto.x=245
+            self.texto.y=215
+            self.pausado=True
+            pilas.eventos.mueve_mouse.desconectar_por_id("mover") 
+        
+        
     def agregar_bombas(self):
         
-        nueva_bomba=pilas.actores.Bomba() 
-        nueva_bomba.x =  [-200,pilas.azar(-300,280)]
-        nueva_bomba.y =[-150,pilas.azar(-240,220)]           
+        nueva_bomba=pilas.actores.Bomba()
+        nueva_bomba.hacer(pilas.comportamientos.Orbitar,pilas.azar(-300,280),pilas.azar(-240,220),pilas.azar(1,100),10)          
         self.bomba.agregar(nueva_bomba)
-
+        
+    def agregar_bombas_lineales(self):
+        bomba=pilas.actores.Bomba()
+        bomba.x =  [-200,pilas.azar(-300,280)]
+        bomba.y =[-150,pilas.azar(-240,220)]   
+        self.bomba.agregar(bomba)
     def agrega(self):
         pilas.tareas.siempre(2,self.agregar_bombas)
+        pilas.tareas.siempre(3,self.agregar_bombas_lineales)
     
-
 
 class PantallaBienvenida(pilasengine.escenas.Escena):
 
@@ -101,10 +121,7 @@ class PantallaJuego(pilasengine.escenas.Escena):
         
 pilas.escenas.vincular(PantallaBienvenida)
 
-
 pilas.escenas.vincular(PantallaJuego)
-
-
 
 
 pilas.ejecutar()
