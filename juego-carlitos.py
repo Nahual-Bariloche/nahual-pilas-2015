@@ -28,7 +28,9 @@ class Pepa (pilasengine.actores.Actor):
         self.x=evento.x
         self.y=evento.y
         
-        
+   
+  
+                 
 class Juego():
     
     puntaje=pilas.actores.Puntaje(-250,220,color=pilas.colores.blanco)
@@ -36,6 +38,7 @@ class Juego():
     
     def comer_banana(self,pepa,banana):
         banana.eliminar()
+        
         self.puntaje.aumentar(10)
         if (int(self.puntaje.texto) > 95):
             texto=pilas.actores.Texto("Ganaste")
@@ -45,6 +48,9 @@ class Juego():
     
     def explotar_bomba(self,pepa,bomba):
         bomba.explotar()
+        pilas.camara.vibrar(3,0.2) 
+        self.pepa.imagen.definir_cuadro(3)
+        pilas.tareas.agregar(0.5,self.pepa.imagen.definir_cuadro,0) 
         self.puntaje.reducir(15)
         if (int(self.puntaje.texto) < -4):
             texto=pilas.actores.Texto("Reintenta")
@@ -55,12 +61,15 @@ class Juego():
             
     def explotar_dinamita(self,pepa,dinamita):
         dinamita.eliminar()
+        self.pepa.imagen.definir_cuadro(3)
+        pilas.tareas.agregar(0.5,self.pepa.imagen.definir_cuadro,0) 
+        pilas.camara.vibrar(3,0.2) 
         self.puntaje.reducir(5)
         if (self.puntaje.texto == "-5"):
             texto=pilas.actores.Texto("No")
             pilas.fondos.Blanco()
             pepa.eliminar()
-            pilas.escenas.PantallaBienvenida()    
+            pilas.tareas.agregar(6,pilas.escenas.PantallaBienvenida)
 
     def pausar_juego(self):
         if(self.pausado==True):   
@@ -68,6 +77,7 @@ class Juego():
             self.pausa.pintar_normal()
             self.texto.eliminar()
             pilas.eventos.mueve_mouse.conectar(self.pepa.mover_a_la_posicion_del_mouse, id="mover")
+            self.agrega()
             
         else:
             self.pausa.pintar_presionado()
@@ -76,6 +86,8 @@ class Juego():
             self.texto.y=209.5
             self.pausado=True
             pilas.eventos.mueve_mouse.desconectar_por_id("mover")
+            self.oye.terminar()
+            self.mmm.terminar()
 
     def iniciar(self):
         pilas.fondos.Tarde()
@@ -107,9 +119,9 @@ class Juego():
         self.dinamita.agregar(nueva_c4)         
 
     def agrega(self):
-        pilas.tareas.siempre(6,self.agregar_bombas)
+        self.oye=pilas.tareas.siempre(6,self.agregar_bombas)
         
-        pilas.tareas.siempre(2,self.agregar_bombas_c4)
+        self.mmm=pilas.tareas.siempre(2,self.agregar_bombas_c4)
         
     
 

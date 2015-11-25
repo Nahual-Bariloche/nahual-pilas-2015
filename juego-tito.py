@@ -36,6 +36,8 @@ class Juego():
     
     def comer_banana(self,pepa,banana):
         banana.eliminar()
+        self.pepa.imagen.definir_cuadro(4)
+        pilas.tareas.agregar(2,self.pepa.imagen.definir_cuadro,0)
         self.puntaje.aumentar(20)
         if (int(self.puntaje.texto)>450):
             texto=pilas.actores.Texto("You Win")
@@ -46,6 +48,8 @@ class Juego():
     
     def explotar_bomba(self,pepa,bomba):
         bomba.explotar()
+        pilas.camara.vibrar(5,2)
+        
         self.puntaje.reducir(10)
         if (int(self.puntaje.texto)<0):
             texto=pilas.actores.Texto("Try Again")
@@ -65,14 +69,15 @@ class Juego():
         pilas.colisiones.agregar(self.pepa,self.bomba,self.explotar_bomba)
         self.boton=pilas.actores.Boton(245,215)
         self.boton.conectar_presionado(self.boton_pausa)
-
+        pilas.eventos.pulsa_tecla_escape.conectar(self.ir_inicio)
+        
     def boton_pausa(self):
         if(self.pausado):
             self.pausado=False
             self.boton.pintar_normal()
             self.texto.eliminar()
             pilas.eventos.mueve_mouse.conectar(self.pepa.mover_a_la_posicion_del_mouse,id="mover")
-            
+            self.agrega()
         else:
             self.boton.pintar_presionado()
             self.texto=pilas.actores.Texto("Pausado")
@@ -80,7 +85,11 @@ class Juego():
             self.texto.y=215
             self.pausado=True
             pilas.eventos.mueve_mouse.desconectar_por_id("mover") 
+            self.tarea.terminar()
+            self.tarea2.terminar()
         
+    def ir_inicio(self):
+        pilas.escenas.PantallaBienvenida()     
         
     def agregar_bombas(self):
         
@@ -94,8 +103,8 @@ class Juego():
         bomba.y =[-150,pilas.azar(-240,220)]   
         self.bomba.agregar(bomba)
     def agrega(self):
-        pilas.tareas.siempre(2,self.agregar_bombas)
-        pilas.tareas.siempre(3,self.agregar_bombas_lineales)
+        self.tarea=pilas.tareas.siempre(2,self.agregar_bombas)
+        self.tarea2=pilas.tareas.siempre(3,self.agregar_bombas_lineales)
     
 
 class PantallaBienvenida(pilasengine.escenas.Escena):
